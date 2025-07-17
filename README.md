@@ -2,12 +2,33 @@
 ## Install VMware Workstation Pro (optional)
 This option is supposedly the most compatible with container deployment to vSphere. The Workstation Pro client can be downloaded for free. You will need a Broadcom support portal account, but you can create one for free.
 
-- Windows: [Download](https://support.broadcom.com/group/ecx/productfiles?subFamily=VMware%20Workstation%20Pro&displayGroup=VMware%20Workstation%20Pro%2017.0%20for%20Windows&release=17.6.4&os=&servicePk=&language=EN&freeDownloads=true)
-- Linux: [Download](https://support.broadcom.com/group/ecx/productfiles?subFamily=VMware%20Workstation%20Pro&displayGroup=VMware%20Workstation%20Pro%2017.0%20for%20Linux&release=17.6.4&os=&servicePk=&language=EN&freeDownloads=true)
+### Windows: 
+[Download](https://support.broadcom.com/group/ecx/productfiles?subFamily=VMware%20Workstation%20Pro&displayGroup=VMware%20Workstation%20Pro%2017.0%20for%20Windows&release=17.6.4&os=&servicePk=&language=EN&freeDownloads=true)
+
+The Linux client can also be installed 
 
 Once installed, ensure that `vmrun` is available from the command line by verifying that `C:\Program Files (x86)\VMware\VMware Workstation` exists in system PATH. 
 
 > NOTE: I had `C:\Program Files (x86)\VMware\VMware Workstation\bin`, but not `C:\Program Files (x86)\VMware\VMware Workstation` and had to add it manually.
+
+### Ubuntu (and variants): 
+[Download](https://support.broadcom.com/group/ecx/productfiles?subFamily=VMware%20Workstation%20Pro&displayGroup=VMware%20Workstation%20Pro%2017.0%20for%20Linux&release=17.6.4&os=&servicePk=&language=EN&freeDownloads=true)
+
+Install prerequisites first by running: 
+```
+sudo apt update
+sudo apt install -y build-essential -y
+```
+
+To install VMware Workstation Pro, first navigate to the folder it was downloaded to. Then run this command, substituting the name of your specific file, which will be different as newer versions are released.
+```
+sudo bash VMware-Workstation-Full-17.6.4-24832109.x86_64.bundle
+```
+
+Install additional required Kernel modules by running:
+```
+sudo vmware-modconfig --console --install-all
+```
 
 ## Install Docker (optional)
 You must install either VMware Workstation Pro or Docker. You can install both if desired.
@@ -18,9 +39,24 @@ winget install Docker.DockerCLI
 ```
 
 ### Ubuntu (and variants):  
+Install Docker's apt repository:
 ```
-sudo apt update
-sudo apt install docker
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+```
+```
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ```
 
 ### Arch Linux (and variants):  
