@@ -1,1 +1,132 @@
-# minikube-start
+# Set up a Minikube development environment
+## Install VMware Workstation Pro (optional)
+This option is supposedly the most compatible with container deployment to vSphere. The Workstation Pro client can be downloaded for free. You will need a Broadcom support portal account, but you can create one for free.
+
+- Windows: [Download](https://support.broadcom.com/group/ecx/productfiles?subFamily=VMware%20Workstation%20Pro&displayGroup=VMware%20Workstation%20Pro%2017.0%20for%20Windows&release=17.6.4&os=&servicePk=&language=EN&freeDownloads=true)
+- Linux: [Download](https://support.broadcom.com/group/ecx/productfiles?subFamily=VMware%20Workstation%20Pro&displayGroup=VMware%20Workstation%20Pro%2017.0%20for%20Linux&release=17.6.4&os=&servicePk=&language=EN&freeDownloads=true)
+
+Once installed, ensure that `vmrun` is available from the command line by verifying that `C:\Program Files (x86)\VMware\VMware Workstation` exists in system PATH. 
+
+> NOTE: I had `C:\Program Files (x86)\VMware\VMware Workstation\bin`, but not `C:\Program Files (x86)\VMware\VMware Workstation` and had to add it manually.
+
+## Install Docker (optional)
+You must install either VMware Workstation Pro or Docker. You can install both if desired.
+
+### Windows 11:  
+```
+winget install Docker.DockerCLI
+```
+
+### Ubuntu (and variants):  
+```
+sudo apt update
+sudo apt install docker
+```
+
+### Arch Linux (and variants):  
+```
+sudo pacman -Syu
+sudo pacman -S docker
+```
+NOTE: By default, Docker runs as a system service. As a best practice, Docker can be run rootless. This requires additional set up.
+
+Install the docker-rootless package from the Arch User Repository: 
+```
+sudo paru -S docker-rootless
+```
+OR
+```
+sudo yay -S docker-rootless
+```
+You will need an AUR helper to install all components. Two common helpers are Yay and Paru. Paru is my preference. It can be installed by following the installation instructions on it's [Github](https://github.com/Morganamilo/paru).
+
+## Install Kubectl
+kubectl is a command-line tool used to interact with Kubernetes clusters. It acts as a bridge between users and the Kubernetes control plane, allowing users to manage and operate Kubernetes resources such as pods, services, deployments, and more.
+
+### Windows 11: 
+```
+winget install Kubernetes.kubectl
+```
+Verify kubectl is installed by running this command.
+```
+kubectl version --client
+```
+### Linux:
+Ubuntu (and variants):  
+```
+sudo apt update
+sudo apt install kubectl
+```
+
+Arch Linux (and variants):
+```
+sudo pacman -Syu
+sudo pacman -S kubectl
+```
+
+## Install Minikube
+Minikube is a lightweight Kubernetes implementation that creates a single-node Kubernetes cluster on your local machine. It is designed to simplify local Kubernetes development, making it accessible for developers to learn and test Kubernetes-based applications without needing a full multi-node cluster or cloud resources. Minikube is available for various operating systems, including Linux, macOS, and Windows.
+
+### Windows 11:
+```
+winget install Kubernetes.minikube
+```
+Verify that minikube was install successfully by running:
+```
+minikube version
+```
+
+### Linux:
+Ubuntu (and variants):  
+```
+sudo apt update
+sudo apt install minikube
+```
+
+Arch Linux (and variants):
+```
+sudo pacman -Syu
+sudo pacman -S minikube
+```
+Verify that minikube was install successfully by running:
+```
+minikube version
+```
+
+## Start Minikube
+If you installed VMware Workstation Pro, you can start minikube by running: 
+```
+minikube start --driver=vmware
+```
+If you installed Docker, you can run: 
+```
+minikube start --driver=docker
+```
+You should now successfully have a minikube development environment up and running. 
+
+# Usage Examples
+## Drupal
+### Install Helm:
+#### Windows
+Helm is the best way to find, share, and use software built for Kubernetes. Helm helps you manage Kubernetes applications — Helm Charts help you define, install, and upgrade even the most complex Kubernetes application.
+
+Learn more here: https://www.freecodecamp.org/news/what-is-a-helm-chart-tutorial-for-kubernetes-beginners/
+
+Windows: 
+```
+winget install Helm.Helm
+```
+### Install Drupal using Helm
+First add the Bitnami repository to Helm:
+```
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+```
+Next Install the Drupal Helm chart. Replace `my-drupal` with your preferred release name. Set secure passwords for Drupal admin and the database root (avoid defaults in production-like setups).
+```
+helm install my-drupal oci://registry-1.docker.io/bitnamicharts/drupal --set drupalUsername=admin --set drupalPassword=your-secure-password --set mariadb.auth.rootPassword=your-db-root-password --set mariadb.auth.password=your-db-password
+```
+It will take several minutes to deploy. You can monitor the status of the deployment by running the following command. Substitute the name you used for your drupal instance. 
+```
+kubectl get svc --namespace default -w my-drupal
+``` 
