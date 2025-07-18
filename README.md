@@ -148,21 +148,20 @@ You should now successfully have a minikube development environment up and runni
 # Usage Examples
 ## Drupal
 ### Install Helm:
-#### Windows
 Helm is the best way to find, share, and use software built for Kubernetes. Helm helps you manage Kubernetes applications — Helm Charts help you define, install, and upgrade even the most complex Kubernetes application.
 
 Learn more here: https://www.freecodecamp.org/news/what-is-a-helm-chart-tutorial-for-kubernetes-beginners/
 
-Windows:
+#### Windows:
 ```
 winget install Helm.Helm
 ```
-Ubuntu (and variants):
+#### Ubuntu (and variants):
 > NOTE: The classic tag here is extremely important. This ensures that helm is installed outside of a sandbox.
 ```
 sudo snap install helm --classic
 ```
-Arch Linux (and variants):
+#### Arch Linux (and variants):
 ```
 sudo pacman -S helm
 ```
@@ -172,7 +171,7 @@ First add the Bitnami repository to Helm:
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo update
 ```
-Next Install the Drupal Helm chart. Replace `my-drupal` with your preferred release name. Set secure passwords for Drupal admin and the database root (avoid defaults in production-like setups).
+Next install the Drupal Helm chart. Replace `my-drupal` with your preferred release name. Set secure passwords for Drupal admin and the database root (avoid defaults in production-like setups).
 ```
 helm install my-drupal oci://registry-1.docker.io/bitnamicharts/drupal --set drupalUsername=admin --set drupalPassword=your-secure-password --set mariadb.auth.rootPassword=your-db-root-password --set mariadb.auth.password=your-db-password
 ```
@@ -180,6 +179,12 @@ It will take several minutes to deploy. You can monitor the status of the deploy
 ```
 kubectl get svc --namespace default -w my-drupal
 ```
+as well as
+```
+kubectl get pods
+```
+Once you see a Ready status of 1/1 for both the drupal app container and the mariadb container it is ready.
+
 Once installed you can get the service IP address by running the following command. Substitute my-drupal with the name you used for your drupal instance.
 ```
 minikube service my-drupal --url
