@@ -2,19 +2,19 @@
 ## Install VMware Workstation Pro (optional)
 This option is supposedly the most compatible with container deployment to vSphere. The Workstation Pro client can be downloaded for free. You will need a Broadcom support portal account, but you can create one for free.
 
-### Windows: 
+### Windows:
 [Download](https://support.broadcom.com/group/ecx/productfiles?subFamily=VMware%20Workstation%20Pro&displayGroup=VMware%20Workstation%20Pro%2017.0%20for%20Windows&release=17.6.4&os=&servicePk=&language=EN&freeDownloads=true)
 
-The Linux client can also be installed 
+The Linux client can also be installed
 
-Once installed, ensure that `vmrun` is available from the command line by verifying that `C:\Program Files (x86)\VMware\VMware Workstation` exists in system PATH. 
+Once installed, ensure that `vmrun` is available from the command line by verifying that `C:\Program Files (x86)\VMware\VMware Workstation` exists in system PATH.
 
 > NOTE: I had `C:\Program Files (x86)\VMware\VMware Workstation\bin`, but not `C:\Program Files (x86)\VMware\VMware Workstation` and had to add it manually.
 
-### Ubuntu (and variants): 
+### Ubuntu (and variants):
 [Download](https://support.broadcom.com/group/ecx/productfiles?subFamily=VMware%20Workstation%20Pro&displayGroup=VMware%20Workstation%20Pro%2017.0%20for%20Linux&release=17.6.4&os=&servicePk=&language=EN&freeDownloads=true)
 
-Install prerequisites first by running: 
+Install prerequisites first by running:
 ```
 sudo apt update
 sudo apt install -y build-essential -y
@@ -33,12 +33,12 @@ sudo vmware-modconfig --console --install-all
 ## Install Docker (optional)
 You must install either VMware Workstation Pro or Docker. You can install both if desired.
 
-### Windows 11:  
+### Windows 11:
 ```
 winget install Docker.DockerCLI
 ```
 
-### Ubuntu (and variants):  
+### Ubuntu (and variants):
 Install Docker's apt repository:
 ```
 # Add Docker's official GPG key:
@@ -59,14 +59,14 @@ sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ```
 
-### Arch Linux (and variants):  
+### Arch Linux (and variants):
 ```
 sudo pacman -Syu
 sudo pacman -S docker
 ```
 NOTE: By default, Docker runs as a system service. As a best practice, Docker can be run rootless. This requires additional set up.
 
-Install the docker-rootless package from the Arch User Repository: 
+Install the docker-rootless package from the Arch User Repository:
 ```
 sudo paru -S docker-rootless
 ```
@@ -79,7 +79,7 @@ You will need an AUR helper to install all components. Two common helpers are Ya
 ## Install Kubectl
 kubectl is a command-line tool used to interact with Kubernetes clusters. It acts as a bridge between users and the Kubernetes control plane, allowing users to manage and operate Kubernetes resources such as pods, services, deployments, and more.
 
-### Windows 11: 
+### Windows 11:
 ```
 winget install Kubernetes.kubectl
 ```
@@ -88,7 +88,8 @@ Verify kubectl is installed by running this command.
 kubectl version --client
 ```
 ### Linux:
-Ubuntu (and variants):  
+Ubuntu (and variants):
+> NOTE: The classic tag here is extremely important. This ensures that kubectl is installed outside of a sandbox.
 ```
 sudo snap install kubectl --classic
 ```
@@ -112,7 +113,7 @@ minikube version
 ```
 
 ### Linux:
-Ubuntu (and variants):  
+Ubuntu (and variants):
 ```
 curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
 chmod +x minikube-linux-amd64
@@ -134,15 +135,15 @@ minikube version
 ```
 
 ## Start Minikube
-If you installed VMware Workstation Pro, you can start minikube by running: 
+If you installed VMware Workstation Pro, you can start minikube by running:
 ```
 minikube start --driver=vmware
 ```
-If you installed Docker, you can run: 
+If you installed Docker, you can run:
 ```
 minikube start --driver=docker
 ```
-You should now successfully have a minikube development environment up and running. 
+You should now successfully have a minikube development environment up and running.
 
 # Usage Examples
 ## Drupal
@@ -152,9 +153,18 @@ Helm is the best way to find, share, and use software built for Kubernetes. Helm
 
 Learn more here: https://www.freecodecamp.org/news/what-is-a-helm-chart-tutorial-for-kubernetes-beginners/
 
-Windows: 
+Windows:
 ```
 winget install Helm.Helm
+```
+Ubuntu (and variants):
+> NOTE: The classic tag here is extremely important. This ensures that helm is installed outside of a sandbox.
+```
+sudo snap install helm --classic
+```
+Arch Linux (and variants):
+```
+sudo pacman -S helm
 ```
 ### Install Drupal using Helm
 First add the Bitnami repository to Helm:
@@ -166,7 +176,12 @@ Next Install the Drupal Helm chart. Replace `my-drupal` with your preferred rele
 ```
 helm install my-drupal oci://registry-1.docker.io/bitnamicharts/drupal --set drupalUsername=admin --set drupalPassword=your-secure-password --set mariadb.auth.rootPassword=your-db-root-password --set mariadb.auth.password=your-db-password
 ```
-It will take several minutes to deploy. You can monitor the status of the deployment by running the following command. Substitute the name you used for your drupal instance. 
+It will take several minutes to deploy. You can monitor the status of the deployment by running the following command. Substitute the name you used for your drupal instance.
 ```
 kubectl get svc --namespace default -w my-drupal
-``` 
+```
+Once installed you can get the service IP address by running the following command. Substitute my-drupal with the name you used for your drupal instance.
+```
+minikube service my-drupal --url
+```
+Copy and paste the first URL into a browser and you should see the default Drupal homepage.
