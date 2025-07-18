@@ -90,8 +90,7 @@ kubectl version --client
 ### Linux:
 Ubuntu (and variants):  
 ```
-sudo apt update
-sudo apt install kubectl
+sudo snap install kubectl --classic
 ```
 
 Arch Linux (and variants):
@@ -115,8 +114,13 @@ minikube version
 ### Linux:
 Ubuntu (and variants):  
 ```
-sudo apt update
-sudo apt install minikube
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+chmod +x minikube-linux-amd64
+sudo mv minikube-linux-amd64 /usr/local/bin/minikube
+```
+Verify that minikube was install successfully by running:
+```
+minikube version
 ```
 
 Arch Linux (and variants):
