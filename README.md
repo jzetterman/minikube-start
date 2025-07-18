@@ -189,4 +189,49 @@ Once installed you can get the service IP address by running the following comma
 ```
 minikube service my-drupal --url
 ```
-Copy and paste the first URL into a browser and you should see the default Drupal homepage.
+> NOTE: This command will not exit. It needs to be running for the URLs to be accessible. The first URL is the HTTP URL for the Drupal instance. The second URL is the HTTPS URL for the Drupal instance. Copy the first URL and paste it into your browser, you should be presented with the Drupal welcome page. The next section describes how to configure minikube in a way that allows you to access the Drupal instance from outside the cluster, which is useful for testing and development purposes without keeping your terminal open.
+
+## Configure Ingress
+We will leverage Minikube's built-in Ingress addon, which deploys an NGINX Ingress controller. Once set up, you can access Drupal directly at your Minikube cluster's IP address (e.g., http://192.168.49.2), and this remains available as long as the cluster is running.
+
+### Enable the ingress addon
+```
+minikube addons enable ingress
+```
+Verify that the ingress addon is enabled
+```
+minikube addons list | grep ingress
+```
+### Create an ingress resource
+Create a new file called drupal-ingress.yaml with the following content:
+```
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: drupal-ingress
+spec:
+  rules:
+  - host: drupal.local  # Optional
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: my-drupal
+            port:
+              number: 80
+```
+Apply the ingress resource
+```
+kubectl apply -f drupal-ingress.yaml
+```
+Verify that the ingress resource is created
+```
+kubectl get ingress drupal-ingress
+```
+Optionally, update your hosts file to include the following line. Use the actual IP of your Minikube cluster. You can get it by running `minikube ip`:
+```
+192.168.49.2 drupal.local
+```
+> NOTE: On Windows your hosts file is located at `C:\Windows\System32\drivers\etc\hosts`. On Linux and macOS, it is located at `/etc/hosts`.
